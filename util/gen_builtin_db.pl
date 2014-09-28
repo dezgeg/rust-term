@@ -10,6 +10,7 @@ my @terms = qw(
     screen-256color
     rxvt
     rxvt-unicode
+    rxvt-unicode-256color
     aterm
     Eterm
     kterm
