@@ -15,7 +15,7 @@ pub fn timed_read (timeout: int) -> Option<char> {
     let mut buf = vec!(first as u8);
     let nbytes = str::utf8_char_width(first as u8);
 
-    for _ in iter::range(0, nbytes) {
+    for _ in iter::range(0, nbytes - 1) {
         let next = unsafe { io_helper::timed_read(-1 as i32) };
         if next < 0 {
             return None;
