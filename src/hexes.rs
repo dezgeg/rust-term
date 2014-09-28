@@ -7,6 +7,7 @@ use std::io::stdio::StdWriter;
 use util;
 
 /// Keys that can be returned by `Term::read`.
+#[deriving(PartialEq, Show)]
 pub enum Keypress {
     KeyCharacter(char),
     KeyBackspace,
