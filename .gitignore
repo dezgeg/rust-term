@@ -3,3 +3,5 @@ tmp/built
 *.o
 *.a
 bin/
+lib/
+target/
