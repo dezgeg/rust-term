@@ -47,15 +47,13 @@ impl Term {
         // XXX need to come up with a better way to handle optional caps
         // should be able to use something like has_keypad_xmit or something
         let mut stream = io::stdio::stdout_raw();
-        let terms = ["smkx", "smcup", "sgr0", "cnorm"];
+        let terms = ["smkx", /* "smcup", */ "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
                 Some(e) => { stream.write_str(e.as_slice());  }
                 None    => (), // not a big deal if these don't exist
             }
         }
-
-        stream.write_str(info::clear_screen().as_slice());
 
         Term {
             r: Reader::new(),
@@ -188,7 +186,7 @@ impl Drop for Term {
     fn drop (&mut self) {
         // XXX need to come up with a better way to handle optional caps
         // should be able to use something like has_keypad_xmit or something
-        let terms = ["rmkx", "rmcup", "sgr0", "cnorm"];
+        let terms = ["rmkx", /* "rmcup", */ "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
                 Some(e) => { self.w.stream.write_str(e.as_slice()); }
