@@ -9,7 +9,7 @@ else
 OTHER_SOURCES += src/info/builtin.rs
 CFG =
 endif
-TESTS = bin/termios bin/termios2 bin/termios3 bin/rl bin/password bin/attrs bin/tput
+TESTS = bin/termios bin/termios2 bin/termios3 bin/rl bin/password bin/attrs bin/tput bin/keys
 
 all: build tests
 
