@@ -186,6 +186,7 @@ impl Drop for Term {
         }
 
         // XXX should really restore the previous termios mode...
+        echo(true);
         cooked();
     }
 }
