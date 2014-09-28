@@ -2,6 +2,7 @@ use info;
 use ios::{cooked,cbreak,echo};
 use trie::Trie;
 use std::{str, uint, iter, io};
+use std::io::stdio::StdWriter;
 
 use util;
 
@@ -44,17 +45,21 @@ impl Term {
 
         // XXX need to come up with a better way to handle optional caps
         // should be able to use something like has_keypad_xmit or something
+        let mut stream = io::stdio::stdout_raw();
         let terms = ["smkx", "smcup", "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
-                Some(e) => { io::stdout().write_str(e.as_slice());  }
+                Some(e) => { stream.write_str(e.as_slice());  }
                 None    => (), // not a big deal if these don't exist
             }
         }
 
-        io::stdout().write_str(info::clear_screen().as_slice());
+        stream.write_str(info::clear_screen().as_slice());
 
-        Term { r: Reader::new(), w: Writer::new() }
+        Term {
+            r: Reader::new(),
+            w: Writer::new(stream),
+        }
     }
 
     /// Clears the screen.
@@ -126,7 +131,7 @@ impl Term {
     /**
      * Write a string to the terminal.
      *
-     * Due to buffering, using `io::io::stdout().write_str()` will not work properly. All text
+     * Due to buffering, using `io::stdout().write_str()` will not work properly. All text
      * written to the terminal must go through the `Term` object, or the state
      * of the screen will likely end up incorrect.
      */
@@ -175,7 +180,7 @@ impl Drop for Term {
         let terms = ["rmkx", "rmcup", "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
-                Some(e) => { io::stdout().write_str(e.as_slice()); }
+                Some(e) => { self.w.stream.write_str(e.as_slice()); }
                 None    => (), // not a big deal if these don't exist
             }
         }
@@ -188,6 +193,7 @@ impl Drop for Term {
 struct Writer {
     buf: String,
     state: AttrState,
+    stream: StdWriter,
 }
 
 struct AttrState {
@@ -213,8 +219,12 @@ fn AttrState () -> AttrState {
 }
 
 impl Writer {
-    fn new () -> Writer {
-        Writer { buf: "".to_string(), state: AttrState() }
+    fn new (stream: StdWriter) -> Writer {
+        Writer {
+            buf: "".to_string(),
+            state: AttrState(),
+            stream: stream,
+        }
     }
 
     fn clear (&mut self) {
@@ -371,8 +381,8 @@ impl Writer {
     }
 
     fn flush (&mut self) {
-        io::stdout().write_str(self.buf.as_slice());
-        io::stdout().flush();
+        self.stream.write_str(self.buf.as_slice());
+        self.stream.flush();
         self.buf = "".to_string();
     }
 }
