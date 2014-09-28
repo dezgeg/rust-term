@@ -1,12 +1,11 @@
-extern mod term;
-use std::io::buffered::BufferedReader;
+extern crate termutils;
 use std::io;
 
 fn main () {
-    print("Enter password: ");
-    term::ios::echo(false);
-    let mut reader = BufferedReader::new(io::stdin());
-    let pass = reader.read_line().unwrap_or(~"nothing");
-    term::ios::echo(true);
-    println(format!("\nYour password is: {:s}", pass));
+    print!("Enter password: ");
+    termutils::ios::echo(false);
+    let mut reader = io::stdin();
+    let pass = reader.read_line().unwrap_or("nothing".to_string());
+    termutils::ios::echo(true);
+    println!("\nYour password is: {:s}", pass);
 }

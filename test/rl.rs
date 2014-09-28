@@ -1,8 +1,8 @@
-extern mod term;
+extern crate termutils;
 use std::iter;
-use term::hexes::Term;
-use term::hexes::{KeyCharacter,KeyEscape,KeyUp,KeyDown,KeyLeft,KeyRight,KeyF};
-use term::info::{Color,ColorRed};
+use termutils::hexes::Term;
+use termutils::hexes::{KeyCharacter,KeyEscape,KeyUp,KeyDown,KeyLeft,KeyRight,KeyF};
+use termutils::info::{Color,ColorRed};
 
 fn draw_map (term: &mut Term, color: Option<Color>,
              rows: uint, cols: uint) {
@@ -12,7 +12,7 @@ fn draw_map (term: &mut Term, color: Option<Color>,
     }
     for i in iter::range(0, rows) {
         term.move(0, i);
-        term.write(".".repeat(cols));
+        term.write(".".repeat(cols).as_slice());
     }
 }
 
@@ -38,12 +38,12 @@ fn draw_ground (term: &mut Term, color: Option<Color>,
 }
 
 fn main () {
-    let (cols, rows) = term::ios::size();
+    let (cols, rows) = termutils::ios::size();
 
     {
-        println("Get a new term");
+        println!("Get a new term");
         let mut term = Term::new();
-        println("got term");
+        println!("got term");
 
         let mut x = 0u;
         let mut y = 0u;
@@ -51,7 +51,7 @@ fn main () {
         let mut color  = None;
 
         draw_map(&mut term, color, rows, cols);
-        println("map drawn");
+        println!("map drawn");
 
         loop {
             draw_character(&mut term, None, x, y);
@@ -89,8 +89,8 @@ fn main () {
     // non-escape key quits the program. removing one of the KeyF branches
     // in the above match statement fixes it, as does adding a print
     // statement basically anywhere, or changing the return value of
-    // term::Term::read from "self.w.read()" to "let k = self.w.read(); k"
+    // termutils::termutils::read from "self.w.read()" to "let k = self.w.read(); k"
     // i have basically no way to debug this, and it really doesn't sound
     // like my fault, so i'm going to ignore it for now.
-    println("Be seeing you...");
+    println!("Be seeing you...");
 }

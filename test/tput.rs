@@ -1,15 +1,15 @@
-extern mod term;
+extern crate termutils;
 use std::os;
 
 fn main () {
     if os::args().len() < 2 {
-        fail!(~"usage: tput <terminfo capability>");
+        fail!("usage: tput <terminfo capability>");
     }
 
-    term::info::init();
-    let attr: &str = os::args()[1];
-    let escape = term::info::escape(attr).expect(
-        format!("{:s} is not supported on this terminal", attr)
+    termutils::info::init();
+    let ref attr = os::args()[1];
+    let escape = termutils::info::escape(attr.as_slice()).expect(
+        format!("{:s} is not supported on this terminal", *attr).as_slice()
     );
-    print(escape);
+    println!("{}", escape);
 }

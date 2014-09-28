@@ -1,48 +1,47 @@
-extern mod term;
-use std::io::buffered::BufferedReader;
+extern crate termutils;
 use std::io;
 
 fn main () {
-    term::info::init();
-    println(term::info::exit_attribute_mode());
-    let mut reader = BufferedReader::new(io::stdin());
+    termutils::info::init();
+    println!("{}", termutils::info::exit_attribute_mode());
+    let mut reader = io::stdin();
     loop {
-        println("Attribute?");
-        let mut attr = reader.read_line().unwrap_or(~"");
+        println!("Attribute?");
+        let mut attr = reader.read_line().unwrap_or("".to_string());
         attr = attr.replace("\n", "");
-        if attr.starts_with("fg:") || attr.starts_with("bg:") {
-            let set = if attr.starts_with("fg:") {
-                |c| { println(term::info::set_a_foreground(c)) }
+        if attr.as_slice().starts_with("fg:") || attr.as_slice().starts_with("bg:") {
+            let set = if attr.as_slice().starts_with("fg:") {
+                |c| { println!("{}", termutils::info::set_a_foreground(c)) }
             }
             else {
-                |c| { println(term::info::set_a_background(c)) }
+                |c| { println!("{}", termutils::info::set_a_background(c)) }
             };
 
-            match attr.slice_from(3) {
-                &"black"   => set(term::info::ColorBlack),
-                &"red"     => set(term::info::ColorRed),
-                &"green"   => set(term::info::ColorGreen),
-                &"yellow"  => set(term::info::ColorYellow),
-                &"blue"    => set(term::info::ColorBlue),
-                &"magenta" => set(term::info::ColorMagenta),
-                &"cyan"    => set(term::info::ColorCyan),
-                &"white"   => set(term::info::ColorWhite),
+            match attr.as_slice().slice_from(3) {
+                "black"   => set(termutils::info::ColorBlack),
+                "red"     => set(termutils::info::ColorRed),
+                "green"   => set(termutils::info::ColorGreen),
+                "yellow"  => set(termutils::info::ColorYellow),
+                "blue"    => set(termutils::info::ColorBlue),
+                "magenta" => set(termutils::info::ColorMagenta),
+                "cyan"    => set(termutils::info::ColorCyan),
+                "white"   => set(termutils::info::ColorWhite),
                 _          => (),
             }
         }
         else {
-            match attr {
-                ~"underline"   => println(term::info::enter_underline_mode()),
-                ~"standout"    => println(term::info::enter_standout_mode()),
-                ~"reverse"     => println(term::info::enter_reverse_mode()),
-                ~"bold"        => println(term::info::enter_bold_mode()),
-                ~"blink"       => println(term::info::enter_blink_mode()),
-                ~"reset"       => println(term::info::exit_attribute_mode()),
-                ~"reset_color" => println(term::info::orig_pair()),
-                ~""            => break,
+            match attr.as_slice() {
+                "underline"   => println!("{}", termutils::info::enter_underline_mode()),
+                "standout"    => println!("{}", termutils::info::enter_standout_mode()),
+                "reverse"     => println!("{}", termutils::info::enter_reverse_mode()),
+                "bold"        => println!("{}", termutils::info::enter_bold_mode()),
+                "blink"       => println!("{}", termutils::info::enter_blink_mode()),
+                "reset"       => println!("{}", termutils::info::exit_attribute_mode()),
+                "reset_color" => println!("{}", termutils::info::orig_pair()),
+                ""            => break,
                 _              => (),
             }
         }
     }
-    println(term::info::exit_attribute_mode());
+    println!("{}", termutils::info::exit_attribute_mode());
 }

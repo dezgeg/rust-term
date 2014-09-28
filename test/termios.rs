@@ -1,10 +1,10 @@
-extern mod term;
+extern crate termutils;
 use std::os;
 
 fn main () {
-    match os::args()[1] {
-        ~"echo"   => term::ios::echo(true),
-        ~"noecho" => term::ios::echo(false),
-        _         => fail!(~"unknown argument"),
+    match os::args()[1].as_slice() {
+        "echo"   => termutils::ios::echo(true),
+        "noecho" => termutils::ios::echo(false),
+        _         => fail!("unknown argument"),
     };
 }

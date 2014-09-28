@@ -3,7 +3,7 @@ use ios::{cooked,cbreak,echo};
 use trie::Trie;
 use std::{str, uint, iter, io};
 
-mod util;
+use util;
 
 /// Keys that can be returned by `Term::read`.
 pub enum Keypress {
@@ -25,8 +25,8 @@ pub enum Keypress {
 }
 
 pub struct Term {
-    priv r: Reader,
-    priv w: Writer,
+    r: Reader,
+    w: Writer,
 }
 
 impl Term {
@@ -47,12 +47,12 @@ impl Term {
         let terms = ["smkx", "smcup", "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
-                Some(e) => print(e),
+                Some(e) => { io::stdout().write_str(e.as_slice());  }
                 None    => (), // not a big deal if these don't exist
             }
         }
 
-        print(info::clear_screen());
+        io::stdout().write_str(info::clear_screen().as_slice());
 
         Term { r: Reader::new(), w: Writer::new() }
     }
@@ -126,7 +126,7 @@ impl Term {
     /**
      * Write a string to the terminal.
      *
-     * Due to buffering, using `io::print()` will not work properly. All text
+     * Due to buffering, using `io::io::stdout().write_str()` will not work properly. All text
      * written to the terminal must go through the `Term` object, or the state
      * of the screen will likely end up incorrect.
      */
@@ -175,7 +175,7 @@ impl Drop for Term {
         let terms = ["rmkx", "rmcup", "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
-                Some(e) => print(e),
+                Some(e) => { io::stdout().write_str(e.as_slice()); }
                 None    => (), // not a big deal if these don't exist
             }
         }
@@ -186,8 +186,8 @@ impl Drop for Term {
 }
 
 struct Writer {
-    priv buf: ~str,
-    priv state: AttrState,
+    buf: String,
+    state: AttrState,
 }
 
 struct AttrState {
@@ -214,19 +214,19 @@ fn AttrState () -> AttrState {
 
 impl Writer {
     fn new () -> Writer {
-        Writer { buf: ~"", state: AttrState() }
+        Writer { buf: "".to_string(), state: AttrState() }
     }
 
     fn clear (&mut self) {
-        self.buf.push_str(info::clear_screen());
+        self.buf.push_str(info::clear_screen().as_slice());
     }
 
     fn move (&mut self, col: uint, row: uint) {
         if col == 0u && row == 0u {
-            self.buf.push_str(info::cursor_home());
+            self.buf.push_str(info::cursor_home().as_slice());
         }
         else {
-            self.buf.push_str(info::cursor_address(row, col));
+            self.buf.push_str(info::cursor_address(row, col).as_slice());
         }
     }
 
@@ -235,7 +235,7 @@ impl Writer {
             Some(c) if c == color => {}
             _                     => {
                 self.state.fg = Some(color);
-                self.buf.push_str(info::set_a_foreground(color));
+                self.buf.push_str(info::set_a_foreground(color).as_slice());
             }
         }
     }
@@ -245,7 +245,7 @@ impl Writer {
             Some(c) if c == color => {}
             _                     => {
                 self.state.bg = Some(color);
-                self.buf.push_str(info::set_a_background(color));
+                self.buf.push_str(info::set_a_background(color).as_slice());
             }
         }
     }
@@ -254,10 +254,10 @@ impl Writer {
         if self.state.underline != enabled {
             self.state.underline = enabled;
             if enabled {
-                self.buf.push_str(info::enter_underline_mode());
+                self.buf.push_str(info::enter_underline_mode().as_slice());
             }
             else {
-                self.buf.push_str(info::exit_underline_mode());
+                self.buf.push_str(info::exit_underline_mode().as_slice());
             }
         }
     }
@@ -266,10 +266,10 @@ impl Writer {
         if self.state.standout != enabled {
             self.state.standout = enabled;
             if enabled {
-                self.buf.push_str(info::enter_standout_mode());
+                self.buf.push_str(info::enter_standout_mode().as_slice());
             }
             else {
-                self.buf.push_str(info::exit_standout_mode());
+                self.buf.push_str(info::exit_standout_mode().as_slice());
             }
         }
     }
@@ -278,7 +278,7 @@ impl Writer {
         if self.state.reverse != enabled {
             self.state.reverse = enabled;
             if enabled {
-                self.buf.push_str(info::enter_reverse_mode());
+                self.buf.push_str(info::enter_reverse_mode().as_slice());
             }
             else {
                 self.apply_state();
@@ -290,7 +290,7 @@ impl Writer {
         if self.state.bold != enabled {
             self.state.bold = enabled;
             if enabled {
-                self.buf.push_str(info::enter_bold_mode());
+                self.buf.push_str(info::enter_bold_mode().as_slice());
             }
             else {
                 self.apply_state();
@@ -302,7 +302,7 @@ impl Writer {
         if self.state.blink != enabled {
             self.state.blink = enabled;
             if enabled {
-                self.buf.push_str(info::enter_blink_mode());
+                self.buf.push_str(info::enter_blink_mode().as_slice());
             }
             else {
                 self.apply_state();
@@ -313,7 +313,7 @@ impl Writer {
     fn reset_color (&mut self) {
         self.state.fg = None;
         self.state.bg = None;
-        self.buf.push_str(info::orig_pair());
+        self.buf.push_str(info::orig_pair().as_slice());
     }
 
     fn reset_attributes (&mut self) {
@@ -322,7 +322,7 @@ impl Writer {
     }
 
     fn apply_state (&mut self) {
-        self.buf.push_str(info::exit_attribute_mode());
+        self.buf.push_str(info::exit_attribute_mode().as_slice());
         match self.state.fg {
             Some(c) => self.fg_color(c),
             None    => (),
@@ -350,19 +350,19 @@ impl Writer {
 
     fn cursor (&mut self, enabled: bool) {
         if enabled {
-            self.buf.push_str(info::cursor_invisible());
+            self.buf.push_str(info::cursor_invisible().as_slice());
         }
         else {
-            self.buf.push_str(info::cursor_normal());
+            self.buf.push_str(info::cursor_normal().as_slice());
         }
     }
 
     fn alternate_screen (&mut self, enabled: bool) {
         if enabled {
-            self.buf.push_str(info::enter_ca_mode());
+            self.buf.push_str(info::enter_ca_mode().as_slice());
         }
         else {
-            self.buf.push_str(info::exit_ca_mode());
+            self.buf.push_str(info::exit_ca_mode().as_slice());
         }
     }
 
@@ -371,20 +371,20 @@ impl Writer {
     }
 
     fn flush (&mut self) {
-        print(self.buf);
+        io::stdout().write_str(self.buf.as_slice());
         io::stdout().flush();
-        self.buf = ~"";
+        self.buf = "".to_string();
     }
 }
 
 struct Reader {
-    priv escapes: Trie<Keypress>,
-    priv buf: ~str,
+    escapes: Trie<Keypress>,
+    buf: String,
 }
 
 impl Reader {
     fn new () -> Reader {
-        Reader { escapes: build_escapes_trie(), buf: ~"" }
+        Reader { escapes: build_escapes_trie(), buf: "".to_string() }
     }
 
     fn read (&mut self) -> Option<Keypress> {
@@ -399,7 +399,7 @@ impl Reader {
 
         let mut buf = str::from_char(*first.get_ref());
         loop {
-            if !self.escapes.has_prefix(buf) {
+            if !self.escapes.has_prefix(buf.as_slice()) {
                 /* XXX i think this is a borrow check bug, should look into
                  * it at some point */
                 //return match self.escapes.find(buf) {
@@ -410,19 +410,19 @@ impl Reader {
                 //    }
                 //}
                 {
-                    let k = self.escapes.find(buf);
+                    let k = self.escapes.find(buf.as_slice());
                     if k.is_some() {
                         return *k;
                     }
                 }
-                self.unget(buf);
+                self.unget(buf.as_slice());
                 return self.read();
             }
 
             match util::timed_read(1000000) {
                 Some(next) => { buf.push_char(next) }
                 None       => {
-                    self.unget(buf);
+                    self.unget(buf.as_slice());
                     return self.read();
                 }
             }
@@ -436,7 +436,7 @@ impl Reader {
     fn next_key (&mut self) -> Keypress {
         assert!(self.buf.len() > 0);
         for i in iter::range(0, self.buf.len()) {
-            match self.escapes.find(self.buf.slice(0, i)) {
+            match self.escapes.find(self.buf.as_slice().slice(0, i)) {
                 &Some(k) => {
                     for _ in iter::range(0, i) {
                         self.buf.shift_char();
@@ -446,7 +446,7 @@ impl Reader {
                 &None    => { }
             }
         }
-        let next = self.buf.shift_char();
+        let next = self.buf.shift_char().unwrap();
         return KeyCharacter(next);
     }
 }
@@ -455,32 +455,32 @@ impl Reader {
 fn build_escapes_trie () -> Trie<Keypress> {
     let mut trie = Trie();
 
-    trie.insert(info::key_backspace(), KeyBackspace);
-    trie.insert(info::carriage_return(),  KeyReturn);
-    trie.insert(info::tab(),  KeyTab);
+    trie.insert(info::key_backspace().as_slice(), KeyBackspace);
+    trie.insert(info::carriage_return().as_slice(),  KeyReturn);
+    trie.insert(info::tab().as_slice(),  KeyTab);
 
-    trie.insert(info::key_up(), KeyUp);
-    trie.insert(info::key_down(), KeyDown);
-    trie.insert(info::key_left(), KeyLeft);
-    trie.insert(info::key_right(), KeyRight);
+    trie.insert(info::key_up().as_slice(), KeyUp);
+    trie.insert(info::key_down().as_slice(), KeyDown);
+    trie.insert(info::key_left().as_slice(), KeyLeft);
+    trie.insert(info::key_right().as_slice(), KeyRight);
 
-    trie.insert(info::key_home(), KeyHome);
-    trie.insert(info::key_end(),  KeyEnd);
-    trie.insert(info::key_ic(), KeyInsert);
-    trie.insert(info::key_dc(), KeyDelete);
+    trie.insert(info::key_home().as_slice(), KeyHome);
+    trie.insert(info::key_end().as_slice(),  KeyEnd);
+    trie.insert(info::key_ic().as_slice(), KeyInsert);
+    trie.insert(info::key_dc().as_slice(), KeyDelete);
 
     for i in iter::range(1u, 12u) {
-        trie.insert(info::key_f(i), KeyF(i as int));
+        trie.insert(info::key_f(i).as_slice(), KeyF(i as int));
     }
 
     for i in iter::range(1u8, 26u8) {
         let s = str::from_char(i as char);
-        if (trie.find(s).is_none()) {
-            trie.insert(s, KeyCtrl(i as char));
+        if (trie.find(s.as_slice()).is_none()) {
+            trie.insert(s.as_slice(), KeyCtrl(i as char));
         }
     }
 
-    trie.insert(str::from_char(27u8 as char), KeyEscape);
+    trie.insert(str::from_char(27u8 as char).as_slice(), KeyEscape);
 
     trie
 }

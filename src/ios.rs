@@ -1,4 +1,4 @@
-use std::unstable::finally::Finally;
+use std::finally::Finally;
 
 
 mod c {
@@ -12,7 +12,7 @@ mod c {
         pub fn get() -> uint;
         pub fn set(t: uint);
 
-        pub fn size(cols: *u32, rows: *u32);
+        pub fn size(cols: *mut u32, rows: *mut u32);
     }
 }
 
@@ -59,7 +59,7 @@ pub fn echo (enable: bool) -> int {
  * This will ensure you don't leave the terminal in a broken state, even if
  * the current task fails.
  */
-pub fn preserve<T> (body: || -> T) -> T {
+pub fn preserve<T> (mut body: || -> T) -> T {
     let orig = unsafe { c::get() };
     body.finally(|| {
         unsafe { c::set(orig) };
@@ -68,10 +68,10 @@ pub fn preserve<T> (body: || -> T) -> T {
 
 /// Returns the size of the terminal, as `(columns, rows)`.
 pub fn size() -> (uint, uint) {
-    let cols: u32 = 0;
-    let rows: u32 = 0;
+    let mut cols: u32 = 0;
+    let mut rows: u32 = 0;
     unsafe {
-        c::size(&cols, &rows)
+        c::size(&mut cols, &mut rows)
     }
     (cols as uint, rows as uint)
 }

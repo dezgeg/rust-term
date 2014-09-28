@@ -1,7 +1,7 @@
-#[crate_id = "term"];
-#[feature(macro_rules)];
-#[crate_type = "lib"];
-#[no_main];
+#![crate_name = "termutils"]
+#![feature(macro_rules)]
+#![crate_type = "lib"]
+#![no_main]
 
 pub mod hexes;
 pub mod ios;

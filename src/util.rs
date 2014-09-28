@@ -12,7 +12,7 @@ pub fn timed_read (timeout: int) -> Option<char> {
         return None;
     }
 
-    let mut buf = ~[first as u8];
+    let mut buf = vec!(first as u8);
     let nbytes = str::utf8_char_width(first as u8);
 
     for _ in iter::range(0, nbytes) {
@@ -23,7 +23,7 @@ pub fn timed_read (timeout: int) -> Option<char> {
         buf.push(next as u8);
     }
 
-    Some(unsafe { str::raw::from_byte(buf[0]) }.char_at(0))
+    Some(unsafe { str::raw::from_byte(buf[0]) }.as_slice().char_at(0))
 }
 
 mod io_helper {

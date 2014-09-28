@@ -1,18 +1,19 @@
-use std::util::swap;
 use std::str;
+use std::mem;
 
 // XXX turn this into a radix trie, probably
 pub struct Trie<T> {
-    priv root: ~TrieNode<T>,
+    root: Box<TrieNode<T>>,
+    none: Option<T>, // WTF HACK
 }
 
 pub fn Trie<T> () -> Trie<T> {
-    Trie { root: ~TrieNode() }
+    Trie { root: box TrieNode(), none: None }
 }
 
 struct TrieNode<T> {
-    priv value: Option<T>,
-    priv children: [Option<~TrieNode<T>>, ..256],
+    value: Option<T>,
+    children: [Option<Box<TrieNode<T>>>, ..256],
 }
 
 fn TrieNode<T> () -> TrieNode<T> {
@@ -63,7 +64,7 @@ impl<T> Trie<T> {
         }
         else {
             let bytes = s.as_bytes();
-            let loc = &mut self.root.children[bytes[0]];
+            let loc = &mut self.root.children[bytes[0] as uint];
 
             Trie::insert_vec( loc, bytes.tail(), v);
         }
@@ -77,7 +78,7 @@ impl<T> Trie<T> {
             &node.value
         }
         else {
-            &None
+            &self.none
         }
     }
 
@@ -92,20 +93,20 @@ impl<T> Trie<T> {
         }
     }
 
-    pub fn insert_vec (loc: &mut Option<~TrieNode<T>>, bytes: &[u8], v: T) {
+    pub fn insert_vec (loc: &mut Option<Box<TrieNode<T>>>, bytes: &[u8], v: T) {
         let mut tmp = None;
-        swap(&mut tmp, loc);
+        mem::swap(&mut tmp, loc);
 
         let mut new = match tmp {
             Some(node) => node,
-            None       => ~TrieNode(),
+            None       => box TrieNode(),
         };
 
         if bytes.len() == 0 {
             new.value = Some(v);
         }
         else {
-            Trie::insert_vec(&mut new.children[bytes[0]], bytes.tail(), v);
+            Trie::insert_vec(&mut new.children[bytes[0] as uint], bytes.tail(), v);
         }
 
         *loc = Some(new);
@@ -119,7 +120,7 @@ impl<T> TrieNode<T> {
             (0u, self)
         }
         else {
-            match self.children[bytes[0]] {
+            match self.children[bytes[0] as uint] {
                 Some(ref t) => {
                     let (prefix_length, node) = t.find_prefix_trie(
                         bytes.tail()
