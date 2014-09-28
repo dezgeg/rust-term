@@ -91,6 +91,10 @@ def_escape!(exit_attribute_mode  -> "sgr0")
 def_escape!(cursor_home          -> "home")
 // The terminal escape to move the cursor to (`p1`, `p2`).
 def_escape!(cursor_address       -> "cup", uint, uint)
+// The terminal escape to scroll text up.
+def_escape!(scroll_forward       -> "ind")
+// The terminal escape to scroll text down.
+def_escape!(scroll_reverse       -> "ri")
 // The terminal escape to enable underline mode.
 def_escape!(enter_underline_mode -> "smul")
 // The terminal escape to disable underline mode.

@@ -25,6 +25,8 @@ my @caps = qw(
     sgr0
     home
     cup
+    ind
+    ri
     smul
     rmul
     smso

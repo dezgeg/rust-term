@@ -73,6 +73,16 @@ impl Term {
         self.w.move(col, row);
     }
 
+    /// Scrolls the text up.
+    pub fn scroll_forward (&mut self) {
+        self.w.scroll_forward();
+    }
+
+    /// Scrolls the text down.
+    pub fn scroll_reverse (&mut self) {
+        self.w.scroll_reverse();
+    }
+
     /// Changes the currently active foreground color to `color`.
     pub fn fg_color (&mut self, color: info::Color) {
         self.w.fg_color(color);
@@ -240,6 +250,14 @@ impl Writer {
         else {
             self.buf.push_str(info::cursor_address(row, col).as_slice());
         }
+    }
+
+    pub fn scroll_forward (&mut self) {
+        self.buf.push_str(info::scroll_forward().as_slice());
+    }
+
+    pub fn scroll_reverse (&mut self) {
+        self.buf.push_str(info::scroll_reverse().as_slice());
     }
 
     fn fg_color (&mut self, color: info::Color) {
