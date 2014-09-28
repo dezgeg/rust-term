@@ -467,8 +467,8 @@ fn build_escapes_trie () -> Trie<Keypress> {
     let mut trie = Trie();
 
     trie.insert(info::key_backspace().as_slice(), KeyBackspace);
-    trie.insert(info::carriage_return().as_slice(),  KeyReturn);
-    trie.insert(info::tab().as_slice(),  KeyTab);
+    trie.insert("\n",  KeyReturn);
+    trie.insert("\t",  KeyTab);
 
     trie.insert(info::key_up().as_slice(), KeyUp);
     trie.insert(info::key_down().as_slice(), KeyDown);
