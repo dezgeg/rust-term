@@ -2,7 +2,8 @@ use info;
 use ios::{cooked,cbreak,echo};
 use trie::Trie;
 use std::{str, uint, iter, io};
-use std::io::stdio::StdWriter;
+use std::io::File;
+use std::path::posix::Path;
 
 use util;
 
@@ -46,7 +47,11 @@ impl Term {
 
         // XXX need to come up with a better way to handle optional caps
         // should be able to use something like has_keypad_xmit or something
-        let mut stream = io::stdio::stdout_raw();
+
+        // XXX: this sounds like hack
+        let mut stream = io::File::open_mode(&Path::new("/dev/tty"), io::Open,
+                io::ReadWrite).ok().expect("Open tty");
+
         let terms = ["smkx", /* "smcup", */ "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
@@ -203,7 +208,7 @@ impl Drop for Term {
 struct Writer {
     buf: String,
     state: AttrState,
-    stream: StdWriter,
+    stream: File,
 }
 
 struct AttrState {
@@ -229,7 +234,7 @@ fn AttrState () -> AttrState {
 }
 
 impl Writer {
-    fn new (stream: StdWriter) -> Writer {
+    fn new (stream: File) -> Writer {
         Writer {
             buf: "".to_string(),
             state: AttrState(),

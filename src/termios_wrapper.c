@@ -8,7 +8,7 @@
  * patches welcome */
 
 /* XXX XXX XXX - major hack - most of this C stuff should go away anyway */
-static int tty_fd = -1;
+extern int tty_fd;
 
 static int get_tty_fd(void)
 {
