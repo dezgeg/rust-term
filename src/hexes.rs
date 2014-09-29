@@ -242,11 +242,11 @@ impl TermWriter {
         }
     }
 
-    fn clear (&mut self) {
+    pub fn clear (&mut self) {
         self.buf.push_str(info::clear_screen().as_slice());
     }
 
-    fn move (&mut self, col: uint, row: uint) {
+    pub fn move (&mut self, col: uint, row: uint) {
         if col == 0u && row == 0u {
             self.buf.push_str(info::cursor_home().as_slice());
         }
@@ -263,7 +263,7 @@ impl TermWriter {
         self.buf.push_str(info::scroll_reverse().as_slice());
     }
 
-    fn fg_color (&mut self, color: info::Color) {
+    pub fn fg_color (&mut self, color: info::Color) {
         match self.state.fg {
             Some(c) if c == color => {}
             _                     => {
@@ -273,7 +273,7 @@ impl TermWriter {
         }
     }
 
-    fn bg_color (&mut self, color: info::Color) {
+    pub fn bg_color (&mut self, color: info::Color) {
         match self.state.bg {
             Some(c) if c == color => {}
             _                     => {
@@ -283,7 +283,7 @@ impl TermWriter {
         }
     }
 
-    fn underline (&mut self, enabled: bool) {
+    pub fn underline (&mut self, enabled: bool) {
         if self.state.underline != enabled {
             self.state.underline = enabled;
             if enabled {
@@ -295,7 +295,7 @@ impl TermWriter {
         }
     }
 
-    fn standout (&mut self, enabled: bool) {
+    pub fn standout (&mut self, enabled: bool) {
         if self.state.standout != enabled {
             self.state.standout = enabled;
             if enabled {
@@ -307,7 +307,7 @@ impl TermWriter {
         }
     }
 
-    fn reverse (&mut self, enabled: bool) {
+    pub fn reverse (&mut self, enabled: bool) {
         if self.state.reverse != enabled {
             self.state.reverse = enabled;
             if enabled {
@@ -319,7 +319,7 @@ impl TermWriter {
         }
     }
 
-    fn bold (&mut self, enabled: bool) {
+    pub fn bold (&mut self, enabled: bool) {
         if self.state.bold != enabled {
             self.state.bold = enabled;
             if enabled {
@@ -331,7 +331,7 @@ impl TermWriter {
         }
     }
 
-    fn blink (&mut self, enabled: bool) {
+    pub fn blink (&mut self, enabled: bool) {
         if self.state.blink != enabled {
             self.state.blink = enabled;
             if enabled {
@@ -343,18 +343,18 @@ impl TermWriter {
         }
     }
 
-    fn reset_color (&mut self) {
+    pub fn reset_color (&mut self) {
         self.state.fg = None;
         self.state.bg = None;
         self.buf.push_str(info::orig_pair().as_slice());
     }
 
-    fn reset_attributes (&mut self) {
+    pub fn reset_attributes (&mut self) {
         self.state = AttrState();
         self.apply_state();
     }
 
-    fn apply_state (&mut self) {
+    pub fn apply_state (&mut self) {
         self.buf.push_str(info::exit_attribute_mode().as_slice());
         match self.state.fg {
             Some(c) => self.fg_color(c),
@@ -381,7 +381,7 @@ impl TermWriter {
         }
     }
 
-    fn cursor (&mut self, enabled: bool) {
+    pub fn cursor (&mut self, enabled: bool) {
         if enabled {
             self.buf.push_str(info::cursor_invisible().as_slice());
         }
@@ -390,7 +390,7 @@ impl TermWriter {
         }
     }
 
-    fn alternate_screen (&mut self, enabled: bool) {
+    pub fn alternate_screen (&mut self, enabled: bool) {
         if enabled {
             self.buf.push_str(info::enter_ca_mode().as_slice());
         }
@@ -399,11 +399,11 @@ impl TermWriter {
         }
     }
 
-    fn write (&mut self, text: &str) {
+    pub fn write (&mut self, text: &str) {
         self.buf.push_str(text);
     }
 
-    fn flush (&mut self) {
+    pub fn flush (&mut self) {
         self.stream.write_str(self.buf.as_slice());
         self.stream.flush();
         self.buf = "".to_string();
@@ -420,7 +420,7 @@ impl TermReader {
         TermReader { escapes: build_escapes_trie(), buf: "".to_string() }
     }
 
-    fn read (&mut self) -> Option<Keypress> {
+    pub fn read (&mut self) -> Option<Keypress> {
         if self.buf.len() > 0 {
             return Some(self.next_key());
         }
