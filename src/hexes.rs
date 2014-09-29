@@ -28,8 +28,9 @@ pub enum Keypress {
 }
 
 pub struct Term {
-    r: Reader,
-    w: Writer,
+    // XXX: either use accessors or rename
+    pub r: TermReader,
+    pub w: TermWriter,
 }
 
 impl Term {
@@ -45,13 +46,12 @@ impl Term {
         cbreak();
         echo(false);
 
-        // XXX need to come up with a better way to handle optional caps
-        // should be able to use something like has_keypad_xmit or something
-
         // XXX: this sounds like hack
         let mut stream = io::File::open_mode(&Path::new("/dev/tty"), io::Open,
                 io::ReadWrite).ok().expect("Open tty");
 
+        // XXX need to come up with a better way to handle optional caps
+        // should be able to use something like has_keypad_xmit or something
         let terms = ["smkx", /* "smcup", */ "sgr0", "cnorm"];
         for &cap in terms.iter() {
             match info::escape(cap) {
@@ -61,8 +61,8 @@ impl Term {
         }
 
         Term {
-            r: Reader::new(),
-            w: Writer::new(stream),
+            r: TermReader::new(),
+            w: TermWriter::new(stream),
         }
     }
 
@@ -205,7 +205,7 @@ impl Drop for Term {
     }
 }
 
-struct Writer {
+pub struct TermWriter {
     buf: String,
     state: AttrState,
     stream: File,
@@ -233,9 +233,9 @@ fn AttrState () -> AttrState {
     }
 }
 
-impl Writer {
-    fn new (stream: File) -> Writer {
-        Writer {
+impl TermWriter {
+    fn new (stream: File) -> TermWriter {
+        TermWriter {
             buf: "".to_string(),
             state: AttrState(),
             stream: stream,
@@ -410,14 +410,14 @@ impl Writer {
     }
 }
 
-struct Reader {
+pub struct TermReader {
     escapes: Trie<Keypress>,
     buf: String,
 }
 
-impl Reader {
-    fn new () -> Reader {
-        Reader { escapes: build_escapes_trie(), buf: "".to_string() }
+impl TermReader {
+    fn new () -> TermReader {
+        TermReader { escapes: build_escapes_trie(), buf: "".to_string() }
     }
 
     fn read (&mut self) -> Option<Keypress> {
