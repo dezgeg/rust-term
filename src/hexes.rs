@@ -187,6 +187,8 @@ impl Term {
     }
 }
 
+// XXX - todo - reimplement, doesn't really belong in Drop
+/*
 impl Drop for Term {
     fn drop (&mut self) {
         // XXX need to come up with a better way to handle optional caps
@@ -204,6 +206,7 @@ impl Drop for Term {
         cooked();
     }
 }
+*/
 
 pub struct TermWriter {
     buf: String,
