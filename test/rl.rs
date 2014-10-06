@@ -11,25 +11,25 @@ fn draw_map (term: &mut Term, color: Option<Color>,
         None    => term.reset_color(),
     }
     for i in iter::range(0, rows) {
-        term.move(0, i);
+        term.move_cursor(0, i);
         term.write(".".repeat(cols).as_slice());
     }
 }
 
 fn draw_character (term: &mut Term, color: Option<Color>,
                    x: uint, y: uint) {
-    term.move(x, y);
+    term.move_cursor(x, y);
     match color {
         Some(c) => term.fg_color(c),
         None    => term.reset_color(),
     }
     term.write("@");
-    term.move(x, y);
+    term.move_cursor(x, y);
 }
 
 fn draw_ground (term: &mut Term, color: Option<Color>,
                 x: uint, y: uint) {
-    term.move(x, y);
+    term.move_cursor(x, y);
     match color {
         Some(c) => term.fg_color(c),
         None    => term.reset_color(),

@@ -17,11 +17,11 @@ fn main () {
             match term.read() {
                 Some(KeyCharacter('q')) => break,
                 Some(KeyUp) => {
-                    term.move(0, 0);
+                    term.move_cursor(0, 0);
                     term.scroll_reverse();
                 }
                 Some(KeyDown) => {
-                    term.move(0, rows - 1);
+                    term.move_cursor(0, rows - 1);
                     term.scroll_forward();
                 }
                 _ => (),

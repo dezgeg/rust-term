@@ -72,8 +72,8 @@ impl Term {
     }
 
     /// Moves the cursor to (`col`, `row`).
-    pub fn move (&mut self, col: uint, row: uint) {
-        self.w.move(col, row);
+    pub fn move_cursor (&mut self, col: uint, row: uint) {
+        self.w.move_cursor(col, row);
     }
 
     /// Scrolls the text up.
@@ -249,7 +249,7 @@ impl TermWriter {
         self.buf.push_str(info::clear_screen().as_slice());
     }
 
-    pub fn move (&mut self, col: uint, row: uint) {
+    pub fn move_cursor (&mut self, col: uint, row: uint) {
         if col == 0u && row == 0u {
             self.buf.push_str(info::cursor_home().as_slice());
         }
