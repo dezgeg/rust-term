@@ -18,11 +18,11 @@ fn main () {
                 Some(KeyCharacter('q')) => break,
                 Some(KeyUp) => {
                     term.move_cursor(0, 0);
-                    term.scroll_reverse();
+                    term.scroll_reverse(2);
                 }
                 Some(KeyDown) => {
                     term.move_cursor(0, rows - 1);
-                    term.scroll_forward();
+                    term.scroll_forward(2);
                 }
                 _ => (),
             };

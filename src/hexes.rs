@@ -77,13 +77,13 @@ impl Term {
     }
 
     /// Scrolls the text up.
-    pub fn scroll_forward (&mut self) {
-        self.w.scroll_forward();
+    pub fn scroll_forward (&mut self, lines: uint) {
+        self.w.scroll_forward(lines);
     }
 
     /// Scrolls the text down.
-    pub fn scroll_reverse (&mut self) {
-        self.w.scroll_reverse();
+    pub fn scroll_reverse (&mut self, lines: uint) {
+        self.w.scroll_reverse(lines);
     }
 
     /// Changes the currently active foreground color to `color`.
@@ -258,12 +258,20 @@ impl TermWriter {
         }
     }
 
-    pub fn scroll_forward (&mut self) {
-        self.buf.push_str(info::scroll_forward().as_slice());
+    pub fn scroll_forward (&mut self, lines: uint) {
+        if lines == 1 {
+            self.buf.push_str(info::scroll_forward().as_slice());
+        } else {
+            self.buf.push_str(info::scroll_forward_multiple(lines).as_slice());
+        }
     }
 
-    pub fn scroll_reverse (&mut self) {
-        self.buf.push_str(info::scroll_reverse().as_slice());
+    pub fn scroll_reverse (&mut self, lines: uint) {
+        if lines == 1 {
+            self.buf.push_str(info::scroll_reverse().as_slice());
+        } else {
+            self.buf.push_str(info::scroll_reverse_multiple(lines).as_slice());
+        }
     }
 
     pub fn fg_color (&mut self, color: info::Color) {
